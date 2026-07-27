@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Один важный вопрос 💙</title>
+  <meta name="description" content="Специальное приглашение для тебя 💙" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Pacifico&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- HEARTS CANVAS (all screens) -->
+  <canvas id="heartsCanvas"></canvas>
+
+  <!-- ===================== SCREEN 1: START ===================== -->
+  <section id="screen1" class="screen active">
+    <div class="bg-overlay"></div>
+
+    <div class="s1-content">
+      <div class="photo-wrapper">
+        <div class="photo-glow-outer">
+          <div class="photo-glow-inner">
+            <!-- Carousel: положи photo1.jpg, photo2.jpg, photo3.jpg -->
+            <div class="carousel-track" id="carouselTrack">
+              <img src="photo1.jpg" alt="Фото 1" class="carousel-slide"
+                onerror="this.src='photo.jpg'; this.onerror=null;" />
+              <img src="photo2.jpg" alt="Фото 2" class="carousel-slide"
+                onerror="this.style.display='none'" />
+              <img src="photo3.jpg" alt="Фото 3" class="carousel-slide"
+                onerror="this.style.display='none'" />
+            </div>
+            <!-- Fallback когда вообще нет фото -->
+            <div class="photo-placeholder" id="photoPlaceholder" style="display:none;">
+              <span>💙</span>
+              <small>Положи photo1.jpg рядом</small>
+            </div>
+            <!-- Dots -->
+            <div class="carousel-dots" id="carouselDots"></div>
+          </div>
+        </div>
+      </div>
+
+      <h1 class="main-title">Пойдёшь со&nbsp;мной<br/>на&nbsp;свидание?</h1>
+
+      <div class="buttons-row">
+        <!-- YES BUTTON — anatomical CSS shape -->
+        <button id="btnYes" class="btn-yes" onclick="goToScreen2()">Да!</button>
+
+        <!-- NO BUTTON — runs away, shrinks -->
+        <button id="btnNo" class="btn-no"
+          onmouseenter="runAway(event)"
+          ontouchstart="runAway(event)">Нет</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== SCREEN 2: SURVEY ===================== -->
+  <section id="screen2" class="screen">
+    <div class="bg-overlay"></div>
+
+    <div class="survey-container">
+      <h2 class="survey-title">Давай всё спланируем ✨</h2>
+
+      <!-- Q1: Program (checkbox) -->
+      <div class="question-block">
+        <p class="question-label">Программа вечера <span class="q-hint">(можно несколько)</span></p>
+        <div class="options-grid" id="q1">
+          <label class="opt-btn">
+            <input type="checkbox" name="program" value="🎬 Фильм" />
+            <span>🎬 Фильм</span>
+          </label>
+          <label class="opt-btn">
+            <input type="checkbox" name="program" value="🎲 Настолки" />
+            <span>🎲 Настолки</span>
+          </label>
+          <label class="opt-btn">
+            <input type="checkbox" name="program" value="💬 Игры на понимание" />
+            <span>💬 Игры на понимание</span>
+          </label>
+          <label class="opt-btn">
+            <input type="checkbox" name="program" value="📚 Книги" />
+            <span>📚 Книги</span>
+          </label>
+          <label class="opt-btn">
+            <input type="checkbox" name="program" value="😈 Кое-что бурное" />
+            <span>😈 Кое-что бурное</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Q2: Drink (radio) -->
+      <div class="question-block">
+        <p class="question-label">Под винишко?</p>
+        <div class="options-grid" id="q2">
+          <label class="opt-btn">
+            <input type="radio" name="drink" value="🍷 Да, наливай" />
+            <span>🍷 Да, наливай</span>
+          </label>
+          <label class="opt-btn">
+            <input type="radio" name="drink" value="🧃 Нет, я за ЗОЖ" />
+            <span>🧃 Нет, я за ЗОЖ</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Q3: Location (radio) -->
+      <div class="question-block">
+        <p class="question-label">Где зависнем?</p>
+        <div class="options-grid" id="q3">
+          <label class="opt-btn">
+            <input type="radio" name="location" value="🏠 Моя кв" />
+            <span>🏠 Моя кв</span>
+          </label>
+          <label class="opt-btn">
+            <input type="radio" name="location" value="🚘 Машина" />
+            <span>🚘 Машина</span>
+          </label>
+          <label class="opt-btn">
+            <input type="radio" name="location" value="🌳 Парк" />
+            <span>🌳 Парк</span>
+          </label>
+          <label class="opt-btn">
+            <input type="radio" name="location" value="🏡 Дача" />
+            <span>🏡 Дача</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Q4: Format (radio) -->
+      <div class="question-block">
+        <p class="question-label">Формат?</p>
+        <div class="options-grid" id="q4">
+          <label class="opt-btn">
+            <input type="radio" name="format" value="💖 Свидание" />
+            <span>💖 Свидание</span>
+          </label>
+          <label class="opt-btn">
+            <input type="radio" name="format" value="🤝 Просто встреча" />
+            <span>🤝 Просто встреча</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Q5: Date picker -->
+      <div class="question-block">
+        <p class="question-label">Когда удобно? 📅</p>
+        <div class="date-picker-wrapper">
+          <input type="date" id="datePicker" class="date-input" />
+        </div>
+      </div>
+
+      <button class="btn-next" id="btnNext" onclick="goToScreen3()">Далее ➡️</button>
+    </div>
+  </section>
+
+  <!-- ===================== SCREEN 3: SECRET ===================== -->
+  <section id="screen3" class="screen">
+    <div class="bg-overlay"></div>
+
+    <div class="secret-container">
+      <div class="secret-icon">🤫</div>
+      <h2 class="secret-title">Секретный этап</h2>
+      <p class="secret-desc">
+        Прикрепи фото-настроение для нашего вечера.<br/>
+        Это только для меня 💙
+      </p>
+
+      <label class="btn-pick-photo" for="photoInput">
+        📷 Выбрать фото
+      </label>
+      <input type="file" id="photoInput" accept="image/*" onchange="onPhotoSelected(this)" />
+
+      <div class="photo-name-display" id="photoNameDisplay"></div>
+
+      <div class="secret-actions">
+        <button class="btn-skip" id="btnSkip" onclick="goToScreen4(false)">Пропустить</button>
+        <button class="btn-done" id="btnDone" onclick="goToScreen4(true)" style="display:none;">Готово! 🎉</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== SCREEN 4: FINAL ===================== -->
+  <section id="screen4" class="screen">
+    <div class="bg-overlay"></div>
+
+    <div class="final-container">
+      <p class="ticket-pre">Твой</p>
+      <h2 class="ticket-main-title">🎟️ Билет на свидание</h2>
+
+      <div class="ticket" id="ticket">
+        <div class="ticket-header">
+          <span class="ticket-emoji">💙</span>
+          <span class="ticket-label">SPECIAL DATE</span>
+          <span class="ticket-emoji">💙</span>
+        </div>
+        <div class="ticket-divider">
+          <div class="ticket-hole left"></div>
+          <div class="ticket-line"></div>
+          <div class="ticket-hole right"></div>
+        </div>
+        <div class="ticket-body">
+          <div class="ticket-row">
+            <span class="tk-icon">🗓️</span>
+            <div>
+              <div class="tk-label">Дата</div>
+              <div class="tk-value" id="tk-date">—</div>
+            </div>
+          </div>
+          <div class="ticket-row">
+            <span class="tk-icon">📍</span>
+            <div>
+              <div class="tk-label">Место</div>
+              <div class="tk-value" id="tk-location">—</div>
+            </div>
+          </div>
+          <div class="ticket-row">
+            <span class="tk-icon">🎭</span>
+            <div>
+              <div class="tk-label">Программа</div>
+              <div class="tk-value" id="tk-program">—</div>
+            </div>
+          </div>
+          <div class="ticket-row">
+            <span class="tk-icon">🥂</span>
+            <div>
+              <div class="tk-label">Напиток</div>
+              <div class="tk-value" id="tk-drink">—</div>
+            </div>
+          </div>
+          <div class="ticket-row">
+            <span class="tk-icon">✨</span>
+            <div>
+              <div class="tk-label">Формат</div>
+              <div class="tk-value" id="tk-format">—</div>
+            </div>
+          </div>
+          <div class="ticket-row" id="tk-photo-row" style="display:none;">
+            <span class="tk-icon">📸</span>
+            <div>
+              <div class="tk-label">Фото-настроение</div>
+              <div class="tk-value" id="tk-photo">Прикреплено 💙</div>
+            </div>
+          </div>
+        </div>
+        <div class="ticket-footer">
+          Действителен навсегда 💙
+        </div>
+      </div>
+
+      <!-- SEND STATUS -->
+      <div class="send-status" id="sendStatus"></div>
+
+      <!-- BUSINESS CARD — warm closing -->
+      <div class="business-card" id="businessCard">
+        <div class="bc-avatar">💙</div>
+        <div class="bc-info">
+          <div class="bc-name">Жду твоего ответа</div>
+          <div class="bc-tagline">Ты знаешь, где меня найти 🙂</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
