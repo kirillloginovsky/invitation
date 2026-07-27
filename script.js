@@ -218,14 +218,9 @@ async function sendEmail() {
   statusEl.className   = 'send-status sending';
 
   const { publicKey, serviceId, templateId } = CONFIG.emailjs;
-  if (publicKey === 'YOUR_PUBLIC_KEY') {
-    statusEl.textContent = '⚠️ EmailJS не настроен — данные только на экране';
-    statusEl.className   = 'send-status error';
-    return;
-  }
 
   try {
-    emailjs.init(publicKey);
+    emailjs.init({ publicKey });
 
     const params = {
       date:      state.date,
@@ -249,70 +244,78 @@ async function sendEmail() {
 
 // ── NO BUTTON LOGIC ───────────────────────────────────
 function initNoButton() {
-  const btn    = document.getElementById('btnNo');
-  const margin = 50;
+  const btn = document.getElementById('btnNo');
+  const MARGIN = 55;
 
-  let px = window.innerWidth  * 0.7;
+  // Current tracked position (mirrors CSS initial values)
+  let px = window.innerWidth  * 0.70;
   let py = window.innerHeight * 0.75;
-  let currentSize = 1.0;
+  let currentScale = 1.0;
+
+  // Sync JS position with CSS initial
+  btn.style.left = px + 'px';
+  btn.style.top  = py + 'px';
+
+  function clamp(v, min, max) { return Math.min(Math.max(v, min), max); }
 
   function placeBtn(x, y) {
-    const w   = btn.offsetWidth  * currentSize || 80;
-    const h   = btn.offsetHeight * currentSize || 44;
-    const maxX = window.innerWidth  - w  - margin;
-    const maxY = window.innerHeight - h  - margin;
-    const safeX = Math.min(Math.max(x, margin), maxX);
-    const safeY = Math.min(Math.max(y, margin), maxY);
-    btn.style.left = safeX + 'px';
-    btn.style.top  = safeY + 'px';
-    px = safeX; py = safeY;
+    const bw = (btn.offsetWidth  || 90) * currentScale;
+    const bh = (btn.offsetHeight || 46) * currentScale;
+    px = clamp(x, MARGIN, window.innerWidth  - bw - MARGIN);
+    py = clamp(y, MARGIN, window.innerHeight - bh - MARGIN);
+    btn.style.left = px + 'px';
+    btn.style.top  = py + 'px';
   }
 
-  setTimeout(() => placeBtn(px, py), 150);
-
-  function runAway(clientX, clientY) {
-    // Reflect away from touch/cursor position
-    const bx = px + (btn.offsetWidth  * currentSize) / 2;
-    const by = py + (btn.offsetHeight * currentSize) / 2;
-    const dx = bx - clientX;
-    const dy = by - clientY;
+  function runAway(curX, curY) {
+    // Button center
+    const bx = px + (btn.offsetWidth  * currentScale) / 2;
+    const by = py + (btn.offsetHeight * currentScale) / 2;
+    // Direction away from cursor
+    let dx = bx - curX;
+    let dy = by - curY;
     const dist = Math.sqrt(dx * dx + dy * dy) || 1;
-    // Move in opposite direction of cursor, at least 120px
-    const moveBy = Math.max(160, 300 - dist);
-    let newX = px + (dx / dist) * moveBy + (Math.random() - 0.5) * 60;
-    let newY = py + (dy / dist) * moveBy + (Math.random() - 0.5) * 60;
-    placeBtn(newX, newY);
+    const step = Math.max(140, 280 - dist);
+    // Add some randomness so it doesn't go off-axis
+    const angle = Math.atan2(dy, dx) + (Math.random() - 0.5) * 0.8;
+    placeBtn(
+      px + Math.cos(angle) * step,
+      py + Math.sin(angle) * step
+    );
   }
 
-  // Mouse
+  // —— Mouse events ——
   btn.addEventListener('mouseenter', (e) => runAway(e.clientX, e.clientY));
-  btn.addEventListener('mousemove',  (e) => runAway(e.clientX, e.clientY));
 
-  // Touch — runs away when finger approaches
+  // —— Touch events ——
+  // When finger gets within ~130px of button center, run away
   document.addEventListener('touchmove', (e) => {
     const touch = e.touches[0];
-    const bx = px + (btn.offsetWidth  * currentSize) / 2;
-    const by = py + (btn.offsetHeight * currentSize) / 2;
-    const dx = Math.abs(touch.clientX - bx);
-    const dy = Math.abs(touch.clientY - by);
-    // Если палец ближе 120px — убегает
-    if (dx < 120 && dy < 80) runAway(touch.clientX, touch.clientY);
+    const bx = px + (btn.offsetWidth  * currentScale) / 2;
+    const by = py + (btn.offsetHeight * currentScale) / 2;
+    if (Math.abs(touch.clientX - bx) < 130 && Math.abs(touch.clientY - by) < 90) {
+      runAway(touch.clientX, touch.clientY);
+    }
   }, { passive: true });
 
   btn.addEventListener('touchstart', (e) => {
-    const t = e.touches[0];
-    runAway(t.clientX, t.clientY);
     e.preventDefault();
+    runAway(e.touches[0].clientX, e.touches[0].clientY);
   }, { passive: false });
 
-  // Shrink every second, min 40%
-  const minSize = 0.4;
-  const shrinkInterval = setInterval(() => {
-    if (currentSize <= minSize) { clearInterval(shrinkInterval); return; }
-    currentSize = Math.max(currentSize - 0.03, minSize);
-    btn.style.transform = `scale(${currentSize})`;
-    btn.style.transformOrigin = 'center center';
+  // —— Shrink every second down to 40% ——
+  const minScale = 0.4;
+  const shrinkTimer = setInterval(() => {
+    if (currentScale <= minScale) { clearInterval(shrinkTimer); return; }
+    currentScale = Math.max(currentScale - 0.03, minScale);
+    btn.style.transform       = `scale(${currentScale})`;
+    btn.style.transformOrigin = 'top left';
   }, 1000);
+
+  // Hide button when leaving screen1
+  document.getElementById('btnYes').addEventListener('click', () => {
+    btn.style.display = 'none';
+  });
 }
 
 // ── FALLING HEARTS ────────────────────────────────────
