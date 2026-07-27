@@ -245,76 +245,83 @@ async function sendEmail() {
 // ── NO BUTTON LOGIC ───────────────────────────────────
 function initNoButton() {
   const btn = document.getElementById('btnNo');
-  const MARGIN = 55;
+  const M   = 50; // margin from edges
 
-  // Current tracked position (mirrors CSS initial values)
-  let px = window.innerWidth  * 0.70;
-  let py = window.innerHeight * 0.75;
-  let currentScale = 1.0;
+  // Read initial position from CSS (bottom: 80px, right: 40px)
+  // Convert to top/left absolute coordinates for JS tracking
+  let W  = window.innerWidth;
+  let H  = window.innerHeight;
+  let bw = 90; // approx width before render
+  let bh = 46;
 
-  // Sync JS position with CSS initial
-  btn.style.left = px + 'px';
-  btn.style.top  = py + 'px';
+  // Wait one frame so the button has rendered dimensions
+  requestAnimationFrame(() => {
+    bw = btn.offsetWidth  || 90;
+    bh = btn.offsetHeight || 46;
+    // Initial position: bottom-right corner
+    px = W - 40 - bw;
+    py = H - 80 - bh;
+    applyPos();
+  });
 
-  function clamp(v, min, max) { return Math.min(Math.max(v, min), max); }
+  let px = window.innerWidth  - 40 - bw;
+  let py = window.innerHeight - 80 - bh;
+  let sc = 1.0; // current scale
 
-  function placeBtn(x, y) {
-    const bw = (btn.offsetWidth  || 90) * currentScale;
-    const bh = (btn.offsetHeight || 46) * currentScale;
-    px = clamp(x, MARGIN, window.innerWidth  - bw - MARGIN);
-    py = clamp(y, MARGIN, window.innerHeight - bh - MARGIN);
-    btn.style.left = px + 'px';
-    btn.style.top  = py + 'px';
+  function applyPos() {
+    // Keep within safe bounds
+    const maxX = window.innerWidth  - bw * sc - M;
+    const maxY = window.innerHeight - bh * sc - M;
+    px = Math.min(Math.max(px, M), maxX);
+    py = Math.min(Math.max(py, M), maxY);
+    btn.style.left   = px + 'px';
+    btn.style.top    = py + 'px';
+    btn.style.bottom = 'auto';
+    btn.style.right  = 'auto';
   }
 
   function runAway(curX, curY) {
-    // Button center
-    const bx = px + (btn.offsetWidth  * currentScale) / 2;
-    const by = py + (btn.offsetHeight * currentScale) / 2;
-    // Direction away from cursor
-    let dx = bx - curX;
-    let dy = by - curY;
-    const dist = Math.sqrt(dx * dx + dy * dy) || 1;
-    const step = Math.max(140, 280 - dist);
-    // Add some randomness so it doesn't go off-axis
-    const angle = Math.atan2(dy, dx) + (Math.random() - 0.5) * 0.8;
-    placeBtn(
-      px + Math.cos(angle) * step,
-      py + Math.sin(angle) * step
-    );
+    // Center of button
+    const cx = px + (bw * sc) / 2;
+    const cy = py + (bh * sc) / 2;
+    // Angle away from cursor + slight random jitter
+    const angle = Math.atan2(cy - curY, cx - curX) + (Math.random() - 0.5) * 0.9;
+    const step  = 150 + Math.random() * 80;
+    px += Math.cos(angle) * step;
+    py += Math.sin(angle) * step;
+    applyPos();
   }
 
-  // —— Mouse events ——
-  btn.addEventListener('mouseenter', (e) => runAway(e.clientX, e.clientY));
+  // Mouse
+  btn.addEventListener('mouseenter', e => runAway(e.clientX, e.clientY));
 
-  // —— Touch events ——
-  // When finger gets within ~130px of button center, run away
-  document.addEventListener('touchmove', (e) => {
-    const touch = e.touches[0];
-    const bx = px + (btn.offsetWidth  * currentScale) / 2;
-    const by = py + (btn.offsetHeight * currentScale) / 2;
-    if (Math.abs(touch.clientX - bx) < 130 && Math.abs(touch.clientY - by) < 90) {
-      runAway(touch.clientX, touch.clientY);
+  // Touch — react when finger within 140px of button center
+  document.addEventListener('touchmove', e => {
+    if (btn.classList.contains('hidden')) return;
+    const t  = e.touches[0];
+    const cx = px + (bw * sc) / 2;
+    const cy = py + (bh * sc) / 2;
+    if (Math.abs(t.clientX - cx) < 140 && Math.abs(t.clientY - cy) < 100) {
+      runAway(t.clientX, t.clientY);
     }
   }, { passive: true });
 
-  btn.addEventListener('touchstart', (e) => {
+  btn.addEventListener('touchstart', e => {
     e.preventDefault();
     runAway(e.touches[0].clientX, e.touches[0].clientY);
   }, { passive: false });
 
-  // —— Shrink every second down to 40% ——
-  const minScale = 0.4;
-  const shrinkTimer = setInterval(() => {
-    if (currentScale <= minScale) { clearInterval(shrinkTimer); return; }
-    currentScale = Math.max(currentScale - 0.03, minScale);
-    btn.style.transform       = `scale(${currentScale})`;
+  // Shrink every second, min 40%
+  const shrink = setInterval(() => {
+    if (sc <= 0.4) { clearInterval(shrink); return; }
+    sc = Math.max(sc - 0.03, 0.4);
+    btn.style.transform       = `scale(${sc})`;
     btn.style.transformOrigin = 'top left';
   }, 1000);
 
-  // Hide button when leaving screen1
+  // Hide when going to other screens
   document.getElementById('btnYes').addEventListener('click', () => {
-    btn.style.display = 'none';
+    btn.classList.add('hidden');
   });
 }
 

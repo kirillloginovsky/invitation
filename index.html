@@ -46,11 +46,8 @@
       <h1 class="main-title">Пойдёшь со&nbsp;мной<br/>на&nbsp;свидание?</h1>
 
       <div class="buttons-row">
-        <!-- YES BUTTON — anatomical CSS shape -->
+        <!-- YES BUTTON — heart shape -->
         <button id="btnYes" class="btn-yes" onclick="goToScreen2()">Да!</button>
-
-        <!-- NO BUTTON — runs away, shrinks -->
-        <button id="btnNo" class="btn-no">Нет</button>
       </div>
     </div>
   </section>
@@ -262,6 +259,10 @@
 
     </div>
   </section>
+
+
+  <!-- NO BUTTON — direct body child so position:fixed works relative to viewport -->
+  <button id="btnNo" class="btn-no">Нет</button>
 
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
   <script src="script.js"></script>

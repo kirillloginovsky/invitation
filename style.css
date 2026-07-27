@@ -312,22 +312,27 @@ body::after {
 /* === NO BUTTON === */
 .btn-no {
   position: fixed;
-  top: 75vh;
-  left: 70vw;
-  padding: 14px 28px;
-  background: #4a5568;
-  border: 2px solid rgba(255,255,255,0.18);
+  bottom: 80px;
+  right: 40px;
+  padding: 13px 26px;
+  background: rgba(74, 85, 104, 0.9);
+  border: 2px solid rgba(255,255,255,0.2);
   border-radius: 14px;
-  color: rgba(255,255,255,0.8);
+  color: rgba(255,255,255,0.85);
   font-family: var(--font-main);
   font-size: 16px;
   font-weight: 700;
   cursor: default;
-  transition: none;
-  z-index: 100;
+  z-index: 9999;
   white-space: nowrap;
   pointer-events: auto;
   touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  /* visible by default, JS hides on other screens */
+}
+.btn-no.hidden {
+  display: none;
 }
 
 /* ======================================================
